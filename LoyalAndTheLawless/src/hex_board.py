@@ -146,7 +146,7 @@ class HexBoard:
         pygame.draw.polygon(self.screen, hex_tile['color'], corners)
         
         # Draw black border
-        pygame.draw.polygon(self.screen, self.BLACK, corners, 2)
+        pygame.draw.polygon(self.screen, self.BLACK, corners, 3)
         
         # Draw coordinates on all hexes
         coord_text = f"({hex_tile['q']},{hex_tile['r']})"
@@ -162,6 +162,50 @@ class HexBoard:
             d_rect.center = (int(hex_tile['x']), int(hex_tile['y'] + 10))
             self.screen.blit(d_text, d_rect)
     
+    def has_wall_between(self, coord1, coord2):
+        """Check if there's a wall between two coordinates (order independent)"""
+        wall1 = (coord1, coord2)
+        wall2 = (coord2, coord1)
+        return wall1 in self.walls or wall2 in self.walls
+    
+    def draw_walls(self):
+        """Draw all walls as thick grey lines between hexes"""
+        for wall in self.walls:
+            coord1, coord2 = wall
+            
+            # Find the hex tiles for these coordinates
+            hex1 = None
+            hex2 = None
+            
+            for hex_tile in self.hexagons:
+                if (hex_tile['q'], hex_tile['r']) == coord1:
+                    hex1 = hex_tile
+                elif (hex_tile['q'], hex_tile['r']) == coord2:
+                    hex2 = hex_tile
+            
+            # If both hexes exist, draw wall between them
+            if hex1 and hex2:
+                # Calculate midpoint between hex centers
+                mid_x = (hex1['x'] + hex2['x']) / 2
+                mid_y = (hex1['y'] + hex2['y']) / 2
+                
+                # Calculate direction vector from hex1 to hex2
+                dx = hex2['x'] - hex1['x']
+                dy = hex2['y'] - hex1['y']
+                
+                # Calculate perpendicular vector for wall thickness
+                length = math.sqrt(dx*dx + dy*dy)
+                if length > 0:
+                    # Normalize and rotate 90 degrees
+                    perp_x = -dy / length * self.hex_radius * 0.6
+                    perp_y = dx / length * self.hex_radius * 0.6
+                    
+                    # Wall endpoints
+                    wall_start = (mid_x + perp_x, mid_y + perp_y)
+                    wall_end = (mid_x - perp_x, mid_y - perp_y)
+                    
+                    # Draw thick grey wall
+                    pygame.draw.line(self.screen, (128, 128, 128), wall_start, wall_end, 8)
     
     def draw_board(self):
         """Draw the complete hexagonal board"""
@@ -172,6 +216,8 @@ class HexBoard:
         for hex_tile in self.hexagons:
             self.draw_hexagon(hex_tile)
         
+        # Draw walls on top of hexagons
+        self.draw_walls()
         
         # Draw title
         title = self.font.render("Hexagonal Board - Simple & Difficult Terrain", True, self.WHITE)
