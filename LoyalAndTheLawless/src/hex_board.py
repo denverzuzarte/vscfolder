@@ -33,7 +33,7 @@ class HexBoard:
         self.walls = set()  # Set of ((q1, r1), (q2, r2)) coordinate pairs
         
         # JSON file path
-        self.terrain_file = r"C:\Users\Denver Zuzarte\vsc folder\LoyalAndTheLawless\PDA\src\terrain.json"
+        self.terrain_file = r"C:\Users\Denver Zuzarte\vsc folder\LoyalAndTheLawless\src\terrain.json"
         
         # Player
         self.player = player1
@@ -111,6 +111,9 @@ class HexBoard:
                     self.difficult_terrain = set(tuple(coord) for coord in terrain_list)
                     self.walls = set(tuple(tuple(coord) for coord in wall) for wall in walls_list)
                     
+                    # Add perimeter walls
+                    self.add_perimeter_walls()
+                    
                     print(f"Loaded {len(self.difficult_terrain)} difficult terrain coordinates")
                     for coord in self.difficult_terrain:
                         print(f"  Difficult terrain at: {coord}")
@@ -119,10 +122,39 @@ class HexBoard:
                 print(f"Terrain file {self.terrain_file} not found, starting with empty terrain")
                 self.difficult_terrain = set()
                 self.walls = set()
+                # Add perimeter walls even when no terrain file exists
+                self.add_perimeter_walls()
         except Exception as e:
             print(f"Error loading terrain data: {e}")
             self.difficult_terrain = set()
             self.walls = set()
+            # Add perimeter walls even when there's an error
+            self.add_perimeter_walls()
+    
+    def add_perimeter_walls(self):
+        """Add walls to all perimeter edges of the hexagonal board"""
+        # Create a set of all existing hex coordinates
+        hex_coords = set((hex_tile['q'], hex_tile['r']) for hex_tile in self.hexagons)
+        
+        # For each hex, check its 6 neighbors
+        # Hexagonal directions: (1,0), (1,-1), (0,-1), (-1,0), (-1,1), (0,1)
+        hex_directions = [(1, 0), (1, -1), (0, -1), (-1, 0), (-1, 1), (0, 1)]
+        
+        for hex_tile in self.hexagons:
+            q, r = hex_tile['q'], hex_tile['r']
+            
+            for dq, dr in hex_directions:
+                neighbor_q = q + dq
+                neighbor_r = r + dr
+                neighbor_coord = (neighbor_q, neighbor_r)
+                
+                # If neighbor doesn't exist, this is a perimeter edge
+                if neighbor_coord not in hex_coords:
+                    # Add wall between current hex and the non-existent neighbor
+                    wall = ((q, r), neighbor_coord)
+                    self.walls.add(wall)
+        
+        print(f"Added perimeter walls. Total walls now: {len(self.walls)}")
     
     def save_terrain_data(self):
         """Save difficult terrain coordinates to JSON file"""
@@ -263,6 +295,13 @@ class HexBoard:
             text = self.font.render(name, True, self.WHITE)
             self.screen.blit(text, (50, y_pos))
         
+        # Draw move counter in top right
+        move_counter_text = f"Moves: {self.player.move_count}"
+        counter_surface = self.font.render(move_counter_text, True, self.WHITE)
+        counter_rect = counter_surface.get_rect()
+        counter_rect.topright = (self.width - 20, 20)
+        self.screen.blit(counter_surface, counter_rect)
+        
         # Draw instructions
         instructions = [
             "Terrain loaded from difficult_terrain.json",
@@ -296,7 +335,7 @@ class HexBoard:
                         self.player.toggle_ability_screen()
                     # Handle player movement
                     elif event.key in self.player.movement_keys:
-                        self.player.move(event.key)
+                        self.player.move(event.key, self.difficult_terrain, self.walls)
             
             self.draw_board()
             pygame.display.flip()

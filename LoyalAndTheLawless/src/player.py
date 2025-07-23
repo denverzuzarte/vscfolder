@@ -45,13 +45,34 @@ class Player:
             pygame.K_x: (1, 0)     # x: was d
         }
     
-    def move(self, direction_key):
+    def move(self, direction_key, difficult_terrain_coords=None, walls=None):
         """Move player in hexagonal direction"""
         if direction_key in self.movement_keys:
             dq, dr = self.movement_keys[direction_key]
-            self.q += dq
-            self.r += dr
-            self.move_count += 1
+            new_q = self.q + dq
+            new_r = self.r + dr
+            
+            # Check if there's a wall blocking this movement
+            if walls:
+                current_pos = (self.q, self.r)
+                new_pos = (new_q, new_r)
+                
+                # Check both directions since walls can be stored either way
+                wall1 = (current_pos, new_pos)
+                wall2 = (new_pos, current_pos)
+                
+                if wall1 in walls or wall2 in walls:
+                    print(f"Movement blocked by wall between {current_pos} and {new_pos}")
+                    return False  # Movement blocked by wall
+            
+            # Check if destination is difficult terrain
+            move_cost = 1
+            if difficult_terrain_coords and (new_q, new_r) in difficult_terrain_coords:
+                move_cost = 2
+            
+            self.q = new_q
+            self.r = new_r
+            self.move_count += move_cost
             return True
         return False
     
