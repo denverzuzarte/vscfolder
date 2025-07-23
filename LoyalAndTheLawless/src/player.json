@@ -5,7 +5,8 @@
         "Health":8,
         "Damage":3,
         "range":1,
-        "Special":"IDR his Special"
+        "Special":"IDR his Special",
+        "Photo":"C:\\Users\\Denver Zuzarte\\vsc folder\\LoyalAndTheLawless\\Images\\holy_shit_hot_druid.jpeg"
     },
     "player2":{
         "name":"warlord",
@@ -13,7 +14,8 @@
         "Health":9,
         "Damage":3,
         "range":1,
-        "Special":"IDR his Special"
+        "Special":"IDR his Special",
+        "Photo":"C:\\Users\\Denver Zuzarte\\vsc folder\\LoyalAndTheLawless\\Images\\holy_shit_hot_druid.jpeg"
     },
     "player3":{
         "name":"wizard",
@@ -21,6 +23,7 @@
         "Health":5,
         "Damage":2,
         "range":3,
-        "Special":"IDR his Special"
+        "Special":"IDR his Special",
+        "Photo":"C:\\Users\\Denver Zuzarte\\vsc folder\\LoyalAndTheLawless\\Images\\holy_shit_hot_druid.jpeg"
     }
 }
