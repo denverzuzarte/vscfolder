@@ -4,6 +4,7 @@
         "alignment":"lawless",
         "Health":8,
         "Damage":3,
+        "range":1,
         "Special":"IDR his Special"
     },
     "player2":{
@@ -11,6 +12,15 @@
         "alignment":"Loyal",
         "Health":9,
         "Damage":3,
+        "range":1,
+        "Special":"IDR his Special"
+    },
+    "player3":{
+        "name":"wizard",
+        "alignment":"Neutral",
+        "Health":5,
+        "Damage":2,
+        "range":3,
         "Special":"IDR his Special"
     }
 }
