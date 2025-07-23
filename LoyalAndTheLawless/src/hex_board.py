@@ -3,7 +3,7 @@ import math
 import random
 import json
 import os
-from player import Player
+from .player import Player
 
 class HexBoard:
     """A hexagonal board with simple and difficult terrain"""

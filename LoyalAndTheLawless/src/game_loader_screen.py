@@ -1,6 +1,6 @@
 import pygame
 import sys
-from hex_board import HexBoard
+from .hex_board import HexBoard
 
 class GameLoaderScreen:
     """Main menu screen with game options"""
@@ -20,9 +20,9 @@ class GameLoaderScreen:
         self.LIGHT_GRAY = (200, 200, 200)
         
         # Fonts
-        self.title_font = pygame.font.Font(None, 72)
-        self.menu_font = pygame.font.Font(None, 48)
-        self.text_font = pygame.font.Font(None, 24)
+        self.title_font = pygame.font.Font(None, 72);
+        self.menu_font = pygame.font.Font(None, 48);
+        self.text_font = pygame.font.Font(None, 24);
         
         self.clock = pygame.time.Clock()
         
@@ -34,7 +34,7 @@ class GameLoaderScreen:
             "4) Script"
         ]
         
-        self.selected_option = 0
+        self.selected_option = 0;
         self.current_screen = "main_menu"  # main_menu, rules
         
         # Load rules text
@@ -190,6 +190,5 @@ class GameLoaderScreen:
         pygame.quit()
         sys.exit()
 
-if __name__ == "__main__":
-    loader = GameLoaderScreen()
-    loader.run()
+loader = GameLoaderScreen()
+loader.run()
