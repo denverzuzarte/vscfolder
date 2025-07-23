@@ -33,14 +33,16 @@ class Player:
         self.font = None
         self.ui_font = None
         
-        # Hexagonal movement directions
+        # Hexagonal movement directions (rotated 60 degrees clockwise)
+        # Original: d(1,0), e(1,-1), w(0,-1), a(-1,0), z(-1,1), x(0,1)
+        # After 60° clockwise rotation:
         self.movement_keys = {
-            pygame.K_d: (1, 0),    # d: +1,0
-            pygame.K_e: (1, -1),   # e: +1,-1  
-            pygame.K_w: (0, -1),   # w: 0,-1
-            pygame.K_a: (-1, 0),   # a: -1,0
-            pygame.K_z: (-1, 1),   # z: -1,+1
-            pygame.K_x: (0, 1)     # x: 0,+1
+            pygame.K_d: (1, -1),   # d: was e
+            pygame.K_e: (0, -1),   # e: was w  
+            pygame.K_w: (-1, 0),   # w: was a
+            pygame.K_a: (-1, 1),   # a: was z
+            pygame.K_z: (0, 1),    # z: was x
+            pygame.K_x: (1, 0)     # x: was d
         }
     
     def move(self, direction_key):
@@ -82,8 +84,19 @@ class Player:
     
     def get_pixel_position(self, center_x, center_y):
         """Convert hex coordinates to pixel coordinates"""
-        x = center_x + self.hex_radius * 1.5 * self.q
-        y = center_y + self.hex_radius * math.sqrt(3) * (self.r + self.q / 2)
+        # Standard coordinates
+        standard_x = self.hex_radius * 1.5 * self.q
+        standard_y = self.hex_radius * math.sqrt(3) * (self.r + self.q / 2)
+        
+        # Rotate by 30 degrees anticlockwise
+        cos30 = math.cos(math.pi / 6)  # cos(30°) = √3/2
+        sin30 = math.sin(math.pi / 6)  # sin(30°) = 0.5
+        
+        rotated_x = standard_x * cos30 - standard_y * sin30
+        rotated_y = standard_x * sin30 + standard_y * cos30
+        
+        x = center_x + rotated_x
+        y = center_y + rotated_y
         return x, y
     
     def _ensure_fonts(self):

@@ -59,8 +59,19 @@ class HexBoard:
             r2 = min(self.board_radius - 1, -q + self.board_radius - 1)
             for r in range(r1, r2 + 1):
                 # Convert cube coordinates to pixel coordinates
-                x = center_x + self.hex_radius * 1.5 * q
-                y = center_y + self.hex_radius * math.sqrt(3) * (r + q / 2)
+                # Standard coordinates
+                standard_x = self.hex_radius * 1.5 * q
+                standard_y = self.hex_radius * math.sqrt(3) * (r + q / 2)
+                
+                # Rotate by 30 degrees anticlockwise
+                cos30 = math.cos(math.pi / 6)  # cos(30°) = √3/2
+                sin30 = math.sin(math.pi / 6)  # sin(30°) = 0.5
+                
+                rotated_x = standard_x * cos30 - standard_y * sin30
+                rotated_y = standard_x * sin30 + standard_y * cos30
+                
+                x = center_x + rotated_x
+                y = center_y + rotated_y
                 
                 # All hexes are now land terrain (simple by default)
                 #if :
@@ -136,7 +147,8 @@ class HexBoard:
         """Calculate the 6 corners of a hexagon"""
         corners = []
         for i in range(6):
-            angle = i * math.pi / 3
+            # Rotate each corner by 30 degrees (π/6 radians)
+            angle = i * math.pi / 3 + math.pi / 6
             x = center_x + self.hex_radius * math.cos(angle)
             y = center_y + self.hex_radius * math.sin(angle)
             corners.append((x, y))
