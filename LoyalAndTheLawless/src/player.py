@@ -2,21 +2,26 @@ import pygame
 import math
 
 class Player:
-    """Player class with health, attack damage, and abilities"""
+    """Player class using data from player.json"""
     
-    def __init__(self, player_id, start_q, start_r, hex_radius=40):
-        self.player_id = player_id
-        self.q = start_q  # Hex coordinate q
-        self.r = start_r  # Hex coordinate r
+    def __init__(self, player_data, hex_radius=40):
+        # Player data from JSON
+        self.name = player_data['name']
+        self.alignment = player_data['alignment']
+        self.max_health = player_data['Health']
+        self.current_health = player_data['Health']
+        self.damage = player_data['Damage']
+        self.range = player_data['range']
+        self.max_moves = player_data['moves']
+        self.current_moves = player_data['moves']
+        self.special = player_data['Special']
+        self.photo_path = player_data['Photo']
+        
+        # Game state
+        self.q = 0  # Starting hex coordinate q
+        self.r = 0  # Starting hex coordinate r
         self.hex_radius = hex_radius
-        
-        # Player stats
-        self.health = 100
-        self.max_health = 100
-        self.attack_damage = 25
-        
-        # Movement
-        self.move_count = 0
+        self.total_moves = 0  # Total moves made in game
         
         # UI state
         self.ability_screen_open = False
@@ -34,8 +39,6 @@ class Player:
         self.ui_font = None
         
         # Hexagonal movement directions (rotated 60 degrees clockwise)
-        # Original: d(1,0), e(1,-1), w(0,-1), a(-1,0), z(-1,1), x(0,1)
-        # After 60° clockwise rotation:
         self.movement_keys = {
             pygame.K_d: (1, -1),   # d: was e
             pygame.K_e: (0, -1),   # e: was w  
@@ -45,8 +48,17 @@ class Player:
             pygame.K_x: (1, 0)     # x: was d
         }
     
+    def new_turn(self):
+        """Reset moves for new turn"""
+        self.current_moves = self.max_moves
+        print(f"{self.name} starts new turn with {self.max_moves} moves")
+    
     def move(self, direction_key, difficult_terrain_coords=None, walls=None):
         """Move player in hexagonal direction"""
+        if self.current_moves <= 0:
+            print(f"{self.name} has no moves left this turn!")
+            return False
+            
         if direction_key in self.movement_keys:
             dq, dr = self.movement_keys[direction_key]
             new_q = self.q + dq
@@ -70,9 +82,15 @@ class Player:
             if difficult_terrain_coords and (new_q, new_r) in difficult_terrain_coords:
                 move_cost = 2
             
+            # Check if player has enough moves
+            if self.current_moves < move_cost:
+                print(f"{self.name} needs {move_cost} moves but only has {self.current_moves} left!")
+                return False
+            
             self.q = new_q
             self.r = new_r
-            self.move_count += move_cost
+            self.current_moves -= move_cost
+            self.total_moves += move_cost
             return True
         return False
     
@@ -86,22 +104,22 @@ class Player:
     
     def use_attack(self):
         """Use basic attack ability"""
-        print(f"Player {self.player_id} uses attack for {self.attack_damage} damage!")
+        print(f"{self.name} uses attack for {self.damage} damage!")
         self.close_ability_screen()
     
     def use_special_move(self):
         """Use special move ability"""
-        print(f"Player {self.player_id} uses special move!")
+        print(f"{self.name} uses special move: {self.special}")
         self.close_ability_screen()
     
     def take_damage(self, damage):
         """Take damage and reduce health"""
-        self.health = max(0, self.health - damage)
-        return self.health <= 0  # Return True if player died
+        self.current_health = max(0, self.current_health - damage)
+        return self.current_health <= 0  # Return True if player died
     
     def heal(self, amount):
         """Heal player"""
-        self.health = min(self.max_health, self.health + amount)
+        self.current_health = min(self.max_health, self.current_health + amount)
     
     def get_pixel_position(self, center_x, center_y):
         """Convert hex coordinates to pixel coordinates"""
@@ -137,8 +155,8 @@ class Player:
         pygame.draw.circle(screen, self.BLACK, (int(x), int(y)), coin_radius)
         pygame.draw.circle(screen, self.WHITE, (int(x), int(y)), coin_radius, 2)
         
-        # Draw player number
-        player_text = self.font.render(str(self.player_id), True, self.WHITE)
+        # Draw player initial
+        player_text = self.font.render(self.name[0].upper(), True, self.WHITE)
         text_rect = player_text.get_rect()
         text_rect.center = (int(x), int(y))
         screen.blit(player_text, text_rect)
@@ -163,7 +181,7 @@ class Player:
         pygame.draw.rect(screen, self.WHITE, screen_rect, 3)
         
         # Title
-        title_text = self.ui_font.render(f"Player {self.player_id} Abilities", True, self.WHITE)
+        title_text = self.ui_font.render(f"{self.name} Abilities", True, self.WHITE)
         title_rect = title_text.get_rect()
         title_rect.centerx = screen_width // 2
         title_rect.y = screen_height//4 + 30
@@ -171,17 +189,20 @@ class Player:
         
         # Player stats
         stats_y = screen_height//4 + 80
-        health_text = self.ui_font.render(f"Health: {self.health}/{self.max_health}", True, self.WHITE)
+        health_text = self.ui_font.render(f"Health: {self.current_health}/{self.max_health}", True, self.WHITE)
         screen.blit(health_text, (screen_width//4 + 20, stats_y))
         
-        damage_text = self.ui_font.render(f"Attack Damage: {self.attack_damage}", True, self.WHITE)
+        damage_text = self.ui_font.render(f"Attack Damage: {self.damage}", True, self.WHITE)
         screen.blit(damage_text, (screen_width//4 + 20, stats_y + 40))
         
-        moves_text = self.ui_font.render(f"Moves: {self.move_count}", True, self.WHITE)
+        moves_text = self.ui_font.render(f"Moves: {self.current_moves}/{self.max_moves}", True, self.WHITE)
         screen.blit(moves_text, (screen_width//4 + 20, stats_y + 80))
         
+        range_text = self.ui_font.render(f"Range: {self.range}", True, self.WHITE)
+        screen.blit(range_text, (screen_width//4 + 20, stats_y + 120))
+        
         # Ability options
-        options_y = screen_height//4 + 200
+        options_y = screen_height//4 + 250
         attack_text = self.ui_font.render("1) Attack", True, self.WHITE)
         screen.blit(attack_text, (screen_width//4 + 20, options_y))
         
@@ -219,10 +240,3 @@ class Player:
                 return True
         
         return False
-
-
-# Starting positions
-x1s, y1s = 0, 0  # Player 1 starting position
-
-# Create player1 object
-player1 = Player(player_id=1, start_q=x1s, start_r=y1s)

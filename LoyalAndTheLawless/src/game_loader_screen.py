@@ -52,7 +52,7 @@ class GameLoaderScreen:
     
     def draw_main_menu(self):
         """Draw the main menu screen"""
-        self.screen.fill(self.BLUE)
+        self.screen.fill(self.BLACK)
         
         # Draw title
         title = self.title_font.render("Game Menu", True, self.WHITE)
