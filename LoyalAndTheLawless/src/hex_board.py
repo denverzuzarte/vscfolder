@@ -3,6 +3,7 @@ import math
 import random
 import json
 import os
+from player import player1
 
 class HexBoard:
     """A hexagonal board with simple and difficult terrain"""
@@ -33,6 +34,9 @@ class HexBoard:
         
         # JSON file path
         self.terrain_file = r"C:\Users\Denver Zuzarte\vsc folder\LoyalAndTheLawless\PDA\src\terrain.json"
+        
+        # Player
+        self.player = player1
         
         # Load existing data
         self.load_terrain_data()
@@ -219,6 +223,12 @@ class HexBoard:
         # Draw walls on top of hexagons
         self.draw_walls()
         
+        # Draw player
+        self.player.draw_player(self.screen, self.width // 2, self.height // 2)
+        
+        # Draw ability screen if open
+        self.player.draw_ability_screen(self.screen, self.width, self.height)
+        
         # Draw title
         title = self.font.render("Hexagonal Board - Simple & Difficult Terrain", True, self.WHITE)
         title_rect = title.get_rect()
@@ -264,8 +274,17 @@ class HexBoard:
                     running = False
                 
                 elif event.type == pygame.KEYDOWN:
+                    # Handle ability screen input first
+                    if self.player.handle_ability_input(event):
+                        continue
+                    
                     if event.key == pygame.K_ESCAPE:
                         running = False
+                    elif event.key == pygame.K_s:
+                        self.player.toggle_ability_screen()
+                    # Handle player movement
+                    elif event.key in self.player.movement_keys:
+                        self.player.move(event.key)
             
             self.draw_board()
             pygame.display.flip()

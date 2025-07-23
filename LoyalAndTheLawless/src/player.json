@@ -1,0 +1,16 @@
+{
+    "player1": {
+        "name":"croc man",
+        "alignment":"lawless",
+        "Health":8,
+        "Damage":3,
+        "Special":"IDR his Special"
+    },
+    "player2":{
+        "name":"warlord",
+        "alignment":"Loyal",
+        "Health":9,
+        "Damage":3,
+        "Special":"IDR his Special"
+    }
+}
