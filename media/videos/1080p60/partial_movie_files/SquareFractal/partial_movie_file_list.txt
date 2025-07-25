@@ -1,0 +1,6 @@
+# This file is used internally by FFMPEG.
+file 'file:C:/Users/Denver Zuzarte/vsc folder/media/videos/1080p60/partial_movie_files/SquareFractal/3977891868_2962155277_223132457.mp4'
+file 'file:C:/Users/Denver Zuzarte/vsc folder/media/videos/1080p60/partial_movie_files/SquareFractal/2852726489_2106725928_60988092.mp4'
+file 'file:C:/Users/Denver Zuzarte/vsc folder/media/videos/1080p60/partial_movie_files/SquareFractal/2852726489_2649748087_3683928588.mp4'
+file 'file:C:/Users/Denver Zuzarte/vsc folder/media/videos/1080p60/partial_movie_files/SquareFractal/2852726489_1037671316_2233725307.mp4'
+file 'file:C:/Users/Denver Zuzarte/vsc folder/media/videos/1080p60/partial_movie_files/SquareFractal/2852726489_4237291445_434803618.mp4'

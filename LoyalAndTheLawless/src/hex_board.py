@@ -34,7 +34,7 @@ class HexBoard:
         self.walls = set()  # Set of ((q1, r1), (q2, r2)) coordinate pairs
         
         # JSON file path
-        self.terrain_file = r"C:\Users\Denver Zuzarte\vsc folder\LoyalAndTheLawless\src\terrain.json"
+        self.terrain_file = r"D:\vsc folder\LoyalAndTheLawless\src\terrain.json"
         
         # Player selection state
         self.game_state = "alignment_selection"  # alignment_selection, player_selection, playing
@@ -150,7 +150,7 @@ class HexBoard:
     
     def load_player_data(self):
         try:
-            with open(r"C:\\Users\\Denver Zuzarte\\vsc folder\\LoyalAndTheLawless\\src\\player.json", 'r') as f:
+            with open(r"D:\\vsc folder\\LoyalAndTheLawless\\src\\player.json", 'r') as f:
                 players_data = json.load(f)
                 
             # Convert to list format for easier handling
@@ -240,7 +240,7 @@ class HexBoard:
         title = self.title_font.render(f"Choose Your Player ({alignment_name} + Neutral)", True, alignment_color)
         title_rect = title.get_rect()
         title_rect.centerx = self.width // 2
-        title_rect.y = 50
+        title_rect.y = 30
         self.screen.blit(title, title_rect)
         
         if not self.available_players:
@@ -251,63 +251,49 @@ class HexBoard:
             self.screen.blit(no_players_text, text_rect)
             return
         
-        # Draw player cards
-        start_x = 100
-        start_y = 150
-        card_width = 300
-        card_height = 200
+        # Display high-quality character images in a grid
+        start_x = 80
+        start_y = 120
+        image_width = 160   # 1:1.5 ratio - width (20% smaller)
+        image_height = 240  # 1:1.5 ratio - height (20% smaller)
         spacing = 50
         
         for i, player_data in enumerate(self.available_players):
-            x = start_x + (i % 3) * (card_width + spacing)
-            y = start_y + (i // 3) * (card_height + spacing)
+            x = start_x + (i % 4) * (image_width + spacing)  # 4 columns
+            y = start_y + (i // 4) * (image_height + spacing + 60)  # Extra space for name
             
-            # Highlight selected player
+            # Highlight selected player with a border
             if i == self.selected_player_index:
-                highlight_rect = pygame.Rect(x - 5, y - 5, card_width + 10, card_height + 10)
-                pygame.draw.rect(self.screen, alignment_color, highlight_rect, 3)
+                highlight_rect = pygame.Rect(x - 5, y - 5, image_width + 10, image_height + 50)
+                pygame.draw.rect(self.screen, alignment_color, highlight_rect, 4)
             
-            # Draw card background
-            card_rect = pygame.Rect(x, y, card_width, card_height)
-            pygame.draw.rect(self.screen, self.GRAY, card_rect)
-            pygame.draw.rect(self.screen, self.WHITE, card_rect, 2)
-            
-            # Draw player image
+            # Draw high-quality player image
             if player_data['name'] in self.player_images and self.player_images[player_data['name']]:
-                image_rect = self.player_images[player_data['name']].get_rect()
-                image_rect.x = x + 10
-                image_rect.y = y + 10
-                self.screen.blit(self.player_images[player_data['name']], image_rect)
+                # Scale image with smooth scaling for clarity and maintain 1:1.5 ratio
+                original_image = self.player_images[player_data['name']]
+                scaled_image = pygame.transform.smoothscale(original_image, (image_width, image_height))
+                self.screen.blit(scaled_image, (x, y))
             else:
-                # Placeholder
-                placeholder_rect = pygame.Rect(x + 10, y + 10, 120, 120)
-                pygame.draw.rect(self.screen, self.LIGHT_GRAY, placeholder_rect)
-                no_img_text = self.font.render("No Image", True, self.BLACK)
+                # Placeholder for missing images
+                placeholder_rect = pygame.Rect(x, y, image_width, image_height)
+                pygame.draw.rect(self.screen, self.GRAY, placeholder_rect)
+                pygame.draw.rect(self.screen, self.WHITE, placeholder_rect, 2)
+                no_img_text = self.menu_font.render("No Image", True, self.WHITE)
                 text_rect = no_img_text.get_rect()
                 text_rect.center = placeholder_rect.center
                 self.screen.blit(no_img_text, text_rect)
             
-            # Draw player info
-            info_x = x + 140
-            name_text = self.menu_font.render(player_data['name'], True, self.BLACK)
-            self.screen.blit(name_text, (info_x, y + 20))
-            
-            health_text = self.font.render(f"Health: {player_data['Health']}", True, self.BLACK)
-            self.screen.blit(health_text, (info_x, y + 60))
-            
-            damage_text = self.font.render(f"Damage: {player_data['Damage']}", True, self.BLACK)
-            self.screen.blit(damage_text, (info_x, y + 80))
-            
-            moves_text = self.font.render(f"Moves: {player_data['moves']}", True, self.BLACK)
-            self.screen.blit(moves_text, (info_x, y + 100))
-            
-            range_text = self.font.render(f"Range: {player_data['range']}", True, self.BLACK)
-            self.screen.blit(range_text, (info_x, y + 120))
+            # Draw player name below the image
+            name_text = self.menu_font.render(player_data['name'].title(), True, self.WHITE)
+            name_rect = name_text.get_rect()
+            name_rect.centerx = x + image_width // 2
+            name_rect.y = y + image_height + 5
+            self.screen.blit(name_text, name_rect)
         
-        # Draw instructions
+        # Draw instructions at the bottom
         instructions = [
-            "Use ARROW KEYS to navigate,"
-            "Press ENTER to select player,"
+            "Use ARROW KEYS to navigate",
+            "Press ENTER to select player",
             "Press ESC to go back"
         ]
         
@@ -315,7 +301,7 @@ class HexBoard:
             text = self.font.render(instruction, True, self.WHITE)
             text_rect = text.get_rect()
             text_rect.centerx = self.width // 2
-            text_rect.y = 650 + i * 20
+            text_rect.y = 720 + i * 20
             self.screen.blit(text, text_rect)
     
     def add_perimeter_walls(self):

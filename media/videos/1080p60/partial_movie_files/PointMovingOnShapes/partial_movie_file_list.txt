@@ -1,0 +1,5 @@
+# This file is used internally by FFMPEG.
+file 'file:D:/vsc folder/media/videos/1080p60/partial_movie_files/PointMovingOnShapes/3977891868_3575364746_3788634887.mp4'
+file 'file:D:/vsc folder/media/videos/1080p60/partial_movie_files/PointMovingOnShapes/2852726489_3898988320_155512321.mp4'
+file 'file:D:/vsc folder/media/videos/1080p60/partial_movie_files/PointMovingOnShapes/2852726489_4233760289_3557789079.mp4'
+file 'file:D:/vsc folder/media/videos/1080p60/partial_movie_files/PointMovingOnShapes/2852726489_1839128356_4072007585.mp4'
