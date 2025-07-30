@@ -3,7 +3,8 @@
     "allow": [
       "Bash(gh:*)",
       "Bash(python:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(pip show:*)"
     ],
     "deny": []
   }
